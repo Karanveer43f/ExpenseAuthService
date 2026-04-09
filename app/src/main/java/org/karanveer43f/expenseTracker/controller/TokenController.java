@@ -8,7 +8,6 @@ import org.karanveer43f.expenseTracker.response.JwtResponseDTO;
 import org.karanveer43f.expenseTracker.service.JwtService;
 import org.karanveer43f.expenseTracker.service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.EntityManagerFactoryAccessor;
