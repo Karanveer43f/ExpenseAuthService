@@ -1,0 +1,25 @@
+$kind: http-request
+name: Refresh Token
+method: POST
+url: "{{baseUrl}}/auth/v1/refreshToken"
+settings:
+  disabledSystemHeaders: []
+order: 3000
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "token": "{{refreshToken}}"
+    }
+scripts:
+  - type: afterResponse
+    code: >-
+      const json = pm.response.json();
+
+      if (json.accessToken) pm.collectionVariables.set("accessToken",
+      json.accessToken);
+
+      if (json.token) pm.collectionVariables.set("refreshToken", json.token);
+    language: text/javascript

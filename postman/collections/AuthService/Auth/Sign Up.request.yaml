@@ -1,0 +1,26 @@
+$kind: http-request
+name: Sign Up
+method: POST
+url: "{{baseUrl}}/auth/v1/signup"
+order: 1000
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "testuser",
+      "password": "password123",
+      "email": "testuser2@example.com",
+      "phone_number": 1234567890
+    }
+scripts:
+  - type: afterResponse
+    code: >-
+      const json = pm.response.json();
+
+      if (json.accessToken) pm.collectionVariables.set("accessToken",
+      json.accessToken);
+
+      if (json.token) pm.collectionVariables.set("refreshToken", json.token);
+    language: text/javascript

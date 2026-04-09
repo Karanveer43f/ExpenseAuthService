@@ -3,6 +3,7 @@ package org.karanveer43f.expenseTracker.controller;
 import org.karanveer43f.expenseTracker.entities.RefreshToken;
 import org.karanveer43f.expenseTracker.request.AuthRequestDTO;
 import org.karanveer43f.expenseTracker.request.RefreshTokenDTO;
+import org.karanveer43f.expenseTracker.response.ErrorResponse;
 import org.karanveer43f.expenseTracker.response.JwtResponseDTO;
 import org.karanveer43f.expenseTracker.service.JwtService;
 import org.karanveer43f.expenseTracker.service.RefreshTokenService;
@@ -17,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Optional;
 
 @Controller
 public class TokenController {
@@ -34,9 +37,14 @@ public class TokenController {
     @PostMapping("/auth/v1/login")
     public ResponseEntity AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO){
         try{
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword())
-            );
+            Authentication authentication;
+            try{
+                authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword())
+                );
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Bad Credentials: " + e.getMessage());
+            }
 
             if(authentication.isAuthenticated()){
                 RefreshToken refreshToken = refreshTokenService.createRefreshToken(authRequestDTO.getUsername());
@@ -49,22 +57,63 @@ public class TokenController {
                 return new ResponseEntity("Invalid Credentials" , null , HttpStatus.BAD_REQUEST);
             }
         }catch (Exception e){
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body("Exception in Authentication" + e.getMessage());
         }
     }
 
-    @PostMapping("auth/v1/refreshToken")
-    public JwtResponseDTO refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO){
-        return refreshTokenService
-                .findByToken(refreshTokenDTO.getToken())
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUserInfo)
-                .map(userInfo -> {
-                    String accessToken = jwtService.GenerateToken(userInfo.getUsername());
-                    return JwtResponseDTO.builder()
-                            .accessToken(accessToken)
-                            .token(refreshTokenDTO.getToken())
-                            .build();
-                }).orElseThrow(()-> new RuntimeException("Refresh token is not in database!"));
+//    @PostMapping("auth/v1/refreshToken")
+//    public ResponseEntity<JwtResponseDTO> refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO){
+//        System.out.println("Refreshing token for " + refreshTokenDTO.getToken());
+//        try{
+//            Optional<RefreshToken> refreshToken = refreshTokenService.findByToken(refreshTokenDTO.getToken());
+//            if(refreshToken.isEmpty()){
+//                return ResponseEntity.badRequest().body(null);
+//            }
+//            refreshToken = Optional.ofNullable(refreshTokenService.verifyExpiration(refreshToken.get()));
+//
+//            String username = refreshToken.get().getUserInfo().getUsername();
+//            String accessToken = jwtService.GenerateToken(username);
+//
+//
+//            return new ResponseEntity<>(JwtResponseDTO.builder()
+//                    .accessToken(accessToken)
+//                    .token(refreshTokenDTO.getToken())
+//                    .build(), null, HttpStatus.OK);
+//
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().body(null);
+//        }
+
+//        return refreshTokenService
+//                .findByToken(refreshTokenDTO.getToken())
+//                .map(refreshTokenService::verifyExpiration)
+//                .map(RefreshToken::getUserInfo)
+//                .map(userInfo -> {
+//                    System.out.println("Generating new token for " + userInfo.getUsername());
+//                    String accessToken = jwtService.GenerateToken(userInfo.getUsername());
+//                    return JwtResponseDTO.builder()
+//                            .accessToken(accessToken)
+//                            .token(refreshTokenDTO.getToken())
+//                            .build();
+//                }).orElseThrow(()-> new RuntimeException("Refresh token is not in database!"));
+//
+//    }
+
+    @PostMapping("/auth/v1/refreshToken")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenDTO dto) {
+        try {
+            JwtResponseDTO response = refreshTokenService.refreshToken(dto.getToken());
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse(e.getMessage(), 403, System.currentTimeMillis()));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Something went wrong", 500, System.currentTimeMillis()));
+        }
     }
 }

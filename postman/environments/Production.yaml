@@ -1,0 +1,6 @@
+name: Production
+values:
+  - key: baseUrl
+    value: 'https://api.example.com'
+    enabled: true
+    type: default

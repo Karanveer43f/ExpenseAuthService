@@ -1,0 +1,14 @@
+$kind: collection
+name: AuthService
+variables:
+  - key: baseUrl
+    value: ''
+  - key: accessToken
+    value: ''
+  - key: refreshToken
+    value: ''
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'

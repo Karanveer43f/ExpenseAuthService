@@ -44,6 +44,7 @@ public class AuthController {
                     .build(
             ), HttpStatus.OK);
         }catch (Exception e){
+            e.printStackTrace();
             return new ResponseEntity("Exception in User Service" + e.getMessage(), null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
