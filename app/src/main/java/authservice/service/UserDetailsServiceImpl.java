@@ -6,6 +6,7 @@ import authservice.entities.UserInfo;
 import authservice.eventProduce.UserInfoProducer;
 import authservice.model.UserInfoDto;
 import authservice.repository.UserRepository;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,15 +20,21 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    @Autowired
     UserRepository userRepository;
-    @Autowired
     PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserInfoProducer userInfoProducer;
+
+    @Autowired
+    public UserDetailsServiceImpl(UserRepository userRepository , PasswordEncoder passwordEncoder){
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
