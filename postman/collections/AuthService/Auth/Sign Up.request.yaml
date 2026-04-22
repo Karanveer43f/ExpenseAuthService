@@ -9,10 +9,12 @@ body:
   type: json
   content: |-
     {
-      "username": "testuser",
+      "username": "testuser5",
       "password": "password123",
-      "email": "testuser2@example.com",
-      "phone_number": 1234567890
+      "email": "testuser5@example.com",
+      "phone_number": 1234567890,
+      "first_name": "karanveer",
+      "last_name": "singh"
     }
 scripts:
   - type: afterResponse

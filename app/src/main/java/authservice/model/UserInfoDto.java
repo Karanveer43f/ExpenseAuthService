@@ -14,7 +14,7 @@ import authservice.entities.UserInfo;
 public class UserInfoDto extends UserInfo {
 
     private String lastName;
-    private String userName;
+    private String firstName;
     private Long phoneNumber;
     private String email;
 }

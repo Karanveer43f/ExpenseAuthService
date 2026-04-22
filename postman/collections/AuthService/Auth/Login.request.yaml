@@ -9,8 +9,9 @@ body:
   type: json
   content: |-
     {
-      "username": "testuser2",
-      "p
+      "username": "testuser",
+      "password" : "password123"
+    }
 scripts:
   - type: afterResponse
     code: >-
